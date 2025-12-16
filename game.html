@@ -121,12 +121,21 @@ p {
         <h1>RunWild</h1>
         <p>A Runcorn Family Matching Game</p>
         <div id="player-selection">
-            <label for="players">Number of Players:</label>
-            <select id="players">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-            </select>
+            <div>
+                <label for="players">Number of Players:</label>
+                <select id="players">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select>
+            </div>
+            <div>
+                <label for="game-mode">Game Mode:</label>
+                <select id="game-mode">
+                    <option value="bluey">Bluey's Rules</option>
+                    <option value="standard">Standard</option>
+                </select>
+            </div>
             <button id="start-game">Start Game</button>
         </div>
         <div id="game-board" class="hidden">
@@ -143,6 +152,7 @@ p {
 const animals = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐸', '🐵', '🐔', '🐧', '🐦', '🦆', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄'];
 
 let numPlayers = 1;
+let gameMode = 'bluey';
 let currentPlayer = 1;
 let scores = [0, 0, 0];
 let flippedTiles = [];
@@ -153,6 +163,7 @@ document.getElementById('start-game').addEventListener('click', startGame);
 
 function startGame() {
     numPlayers = parseInt(document.getElementById('players').value);
+    gameMode = document.getElementById('game-mode').value;
     document.getElementById('player-selection').classList.add('hidden');
     document.getElementById('game-board').classList.remove('hidden');
     
@@ -208,11 +219,17 @@ function checkMatch() {
         if (matchedPairs === 21) {
             alert(`Game over! Player ${currentPlayer} wins!`);
         }
+        // In Standard mode, switch players after a match
+        if (gameMode === 'standard' && numPlayers > 1) {
+            currentPlayer = currentPlayer % numPlayers + 1;
+            updateCurrentPlayer();
+        }
     } else {
         tile1.classList.remove('flipped');
         tile1.textContent = '';
         tile2.classList.remove('flipped');
         tile2.textContent = '';
+        // Always switch players on mismatch in both modes
         if (numPlayers > 1) {
             currentPlayer = currentPlayer % numPlayers + 1;
             updateCurrentPlayer();

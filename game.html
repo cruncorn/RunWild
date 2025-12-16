@@ -17,6 +17,14 @@ body {
     min-height: 100vh;
 }
 
+body.player2 {
+    background-color: pink;
+}
+
+body.player3 {
+    background-color: teal;
+}
+
 #game-container {
     text-align: center;
     max-width: 100vw;
@@ -124,8 +132,8 @@ p {
         <div id="game-board" class="hidden">
             <div id="scores">
                 <div class="score" id="score1">Player 1: 0</div>
-                <div class="score" id="score2" class="hidden">Player 2: 0</div>
-                <div class="score" id="score3" class="hidden">Player 3: 0</div>
+                <div class="score hidden" id="score2">Player 2: 0</div>
+                <div class="score hidden" id="score3">Player 3: 0</div>
             </div>
             <div id="grid"></div>
             <div id="current-player">Player 1's turn</div>
@@ -147,12 +155,12 @@ function startGame() {
     numPlayers = parseInt(document.getElementById('players').value);
     document.getElementById('player-selection').classList.add('hidden');
     document.getElementById('game-board').classList.remove('hidden');
-    if (numPlayers > 1) {
-        document.getElementById('score2').classList.remove('hidden');
-        if (numPlayers > 2) {
-            document.getElementById('score3').classList.remove('hidden');
-        }
-    }
+    
+    // Show/hide scores based on number of players
+    document.getElementById('score2').classList.toggle('hidden', numPlayers < 2);
+    document.getElementById('score3').classList.toggle('hidden', numPlayers < 3);
+    
+    document.body.className = 'player1';
     createGrid();
     updateCurrentPlayer();
 }
@@ -221,6 +229,7 @@ function updateScores() {
 
 function updateCurrentPlayer() {
     document.getElementById('current-player').textContent = `Player ${currentPlayer}'s turn`;
+    document.body.className = `player${currentPlayer}`;
 }
     </script>
 </body>

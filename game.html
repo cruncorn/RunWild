@@ -222,8 +222,8 @@ function flipTile(tile) {
 function checkMatch() {
     const [tile1, tile2] = flippedTiles;
     if (tile1.dataset.animal === tile2.dataset.animal) {
-        tile1.classList.add('matched');
-        tile2.classList.add('matched');
+        tile1.classList.add('matched', `matched-player${currentPlayer}`);
+        tile2.classList.add('matched', `matched-player${currentPlayer}`);
         scores[currentPlayer - 1]++;
         matchedPairs++;
         updateScores();

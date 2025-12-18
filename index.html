@@ -264,7 +264,7 @@ function getWinners(players) {
     // Handle tiebreaker logic here if needed
     return { status: "It's a Tie"};
   } else {
-    return { status: winners[0].name + " Wins" };
+    return { status: maxScore.toString() + " Wins" };
   }
 }
 

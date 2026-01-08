@@ -78,10 +78,9 @@
 
         .stat-value {
             color: white;
-            font-size: clamp (1em, 3vw, 1.30m);
+            font-size: clamp(1em, 3vw, 1.30m);
             font-weight: 700;
         }
-
 
         .content {
             display: flex;
@@ -131,7 +130,7 @@
             cursor: pointer;
             background: white;
             color: #333;
-            transition: background 0.25s, color 0.25s;
+            transition: background 0.2s, color 0.2s;
             -webkit-tap-highlight-color: transparent;
             border-radius: 2px;
         }
@@ -151,7 +150,7 @@
         }
 
         .words-section {
-            width: clamp (120px, 30%, 200px);
+            width: clamp(120px, 30%, 200px);
             display: flex;
             flex-direction: column;
             background: rgba(255, 255, 255, 0.1);
@@ -170,8 +169,8 @@
 
         .words-list {
             display: flex;
-            gap: 8px;
             flex-direction: column;
+            gap: 8px;
             overflow-y: auto;
             flex: 1;
         }
@@ -180,7 +179,7 @@
             background: rgba(255, 255, 255, 0.9);
             padding: 8px;
             border-radius: 4px;
-            font-size: clamp(0.75cm, 2vw, 8.9cm);
+            font-size: clamp(0.75em, 2vw, 0.9em);
             font-weight: 600;
             color: #333;
             text-decoration: none;
@@ -203,12 +202,12 @@
 
         button {
             padding: 8px 16px;
-            border-radius: 6px;
             border: 2px solid white;
+            border-radius: 6px;
             background: white;
             color: #667eea;
             font-weight: 600;
-            font-size: clamp(0.75em, 2vw, 8.9em);
+            font-size: clamp(0.75em, 2vw, 0.9em);
             cursor: pointer;
             transition: all 0.2s;
             -webkit-tap-highlight-color: transparent;
@@ -251,7 +250,6 @@
                 transform: translate(-50%, -60%);
                 opacity: 0;
             }
-
             to {
                 transform: translate(-50%, -50%);
                 opacity: 1;
@@ -305,7 +303,6 @@
             }
     </style>
 </head>
-
 <body>
     <div class="container">
         <div class="header">
@@ -344,7 +341,6 @@
         </div>
 
         <script>
-
             const WORD_LISTS = [
                 ['APPLE', 'SCHOOL', 'FRIEND', 'HAPPY', 'FAMILY', 'PLAY', 'LEARN', 'READ'],
                 ['MATH', 'BOOK', 'TEACHER', 'STUDENT', 'PENCIL', 'DESK', 'LUNCH', 'RECESS'],
@@ -364,7 +360,7 @@
             let dragStartCell = null;
             let draggedCells = new Set();
 
-            const gridContainer = document.getElementById("gridContainer");
+            const gridContainer = document.getElementById('gridContainer');
             const wordsList = document.getElementById('wordsList');
             const message = document.getElementById('message');
             const foundCountEl = document.getElementById('foundCount');
@@ -374,7 +370,7 @@
                 constructor(words) {
                     this.words = words.map(w => w.toUpperCase()).sort((a, b) => b.length - a.length);
                     this.gridsize = this.calculateGridSize();
-                    this.grid = Array(this.gridsize).fill(null).map(() => Array(this.gridSize).fill(""));
+                    this.grid = Array(this.gridsize).fill(null).map(() => Array(this.gridSize).fill(''));
                     this.wordPositions = [];
                 }
 
@@ -390,7 +386,7 @@
                     for (let i = 0; i < word.length; i++) {
                         const r = row + dr * i;
                         const c = col + dc * i;
-                        if (this.grid[r][c] !== "" && this.grid[r][c] !== word[i]) {
+                        if (this.grid[r][c] !== '' && this.grid[r][c] !== word[i]) {
                             return false;
                         }
                     }
@@ -472,7 +468,7 @@
             }
 
             function renderGrid() {
-                gridContainer.innerHTML = "";
+                gridContainer.innerHTML = '';
                 grid.forEach((row, r) => {
                     row.forEach((letter, c) => {
                         const letterEl = document.createElement('div');
@@ -523,7 +519,6 @@
                         });
 
                         gridContainer.appendChild(letterEl);
-
                     });
                 });
 
@@ -541,7 +536,6 @@
                     }
                 });
             }
-
             function toggleCellSelection(r, c) {
                 const cellstr = `${r},${c}`;
                 const index = selectedCells.findIndex(cell => cell[0] === r && cell[1] === c);
@@ -569,7 +563,7 @@
 
             function addToSelection(r, c) {
                 if (selectedCells.some(cell => cell[0] === r && cell[1] === c)) {
-                    if (selectedCells.length || isAdjacent(selectedCells[selectedCells.length - 1], [r, c])) {
+                    if (selectedCells.length === 0 || isAdjacent(selectedCells[selectedCells.length - 1], [r, c])) {
                         selectedCells.push([r, c]);
                         updateGridHighlight();
                     }
@@ -577,7 +571,7 @@
             }
 
             function isAdjacent([r1, c1], [r2, c2]) {
-                return Math.abs(r1 - r2) < 1 && Math.abs(c1 - c2) < 1 && (r1 === r2 || c1 === c2);
+                return Math.abs(r1 - r2) <= 1 && Math.abs(c1 - c2) <= 1 && (r1 !== r2 || c1 !== c2);
             }
 
             function updateGridHighlight() {
@@ -634,6 +628,7 @@
                         // Keep selection visible so user can modify it
                     }
                 }
+                
                 function clearSelection() {
                     selectedCells = [];
                     updateGridHighlight();

@@ -250,6 +250,7 @@
                 transform: translate(-50%, -60%);
                 opacity: 0;
             }
+
             to {
                 transform: translate(-50%, -50%);
                 opacity: 1;
@@ -281,7 +282,7 @@
                 gap: 15px;
                 padding: 6px;
             }
-
+        }
             @media (max-width: 500px) {
                 .stats {
                     gap: 10px;
@@ -303,6 +304,7 @@
             }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -595,7 +597,7 @@
             function checkWord() {
                 const selectedWord = selectedCells.map(([r, c]) => grid[r][c]).join('');
                 const selectedWordReverse = selectedWord.split('').reverse().join('');
-
+            
                 for (const wordPos of grid.wordPositions) {
                     if (wordPos.word === selectedWord || wordPos.word === selectedWordReverse) {
                         if (!foundwords.has(wordPos.word)) {
@@ -614,7 +616,8 @@
                         return true;
                     }
                 }
-
+            }
+            
                 function submitSelection() {
                     if (selectedCells.length === 0) {
                         showMessage('Select at least one letter!');
@@ -628,7 +631,7 @@
                         // Keep selection visible so user can modify it
                     }
                 }
-                
+
                 function clearSelection() {
                     selectedCells = [];
                     updateGridHighlight();
@@ -661,7 +664,8 @@
                 }
 
                 // Start game
-                newPuzzle();
+                newPuzzle();        
         </script>
 </body>
+
 </html>

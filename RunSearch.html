@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit-cover, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>RunSearch</title>
     <style>
         * {
@@ -44,7 +43,6 @@
         }
 
         .header h1 {
-
             color: white;
             font-size: clamp(1.3em, 5vw, 2em);
             margin-bottom: 4px;
@@ -52,7 +50,6 @@
         }
 
         .header p {
-
             color: rgba(255, 255, 255, 0.9);
             font-size: clamp(0.75em, 2vw, 8.9em);
             margin: 0;
@@ -250,7 +247,6 @@
                 transform: translate(-50%, -60%);
                 opacity: 0;
             }
-
             to {
                 transform: translate(-50%, -50%);
                 opacity: 1;
@@ -304,7 +300,6 @@
             }
     </style>
 </head>
-
 <body>
     <div class="container">
         <div class="header">
@@ -378,7 +373,7 @@
 
                 calculateGridSize() {
                     const totallength = this.words.reduce((sum, w) => sum + w.length, 0);
-                    return Math.max(Math.ceil(Math.sqrt(totalLength * 1.5)), 10);
+                    return Math.max(Math.ceil(Math.sqrt(totallength * 1.5)), 10);
                 }
 
                 canPlaceWord(word, row, col, dr, dc) {
@@ -442,7 +437,7 @@
 
                     return {
                         grid: this.grid,
-                        words: this.wordsPositions.map(wp => wp.word),
+                        words: this.wordPositions.map(wp => wp.word),
                         positions: this.wordPositions
                     };
                 }
@@ -617,7 +612,7 @@
                     }
                 }
             }
-            
+
                 function submitSelection() {
                     if (selectedCells.length === 0) {
                         showMessage('Select at least one letter!');
@@ -667,5 +662,4 @@
                 newPuzzle();        
         </script>
 </body>
-
 </html>

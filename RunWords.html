@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <title>RunSearch</title>
+    <title>RunWords</title>
     <style>
         * {
             margin: 0;
@@ -560,10 +560,10 @@
             const keyboardRows = [
                 ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
                 ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
-                ['z', 'X', 'C', 'V', 'B', 'N', 'M']
+                ['Z', 'X', 'C', 'V', 'B', 'N', 'M']
             ];
 
-            for (const row of keyboardRows) {
+            for (const [index, row] of keyboardRows.entries()) {
                 const rowDiv = document.createElement('div');
                 rowDiv.className = 'keyboard-row';
 
@@ -619,27 +619,26 @@
                         key.classList.add('disabled');
                     }
                     rowDiv.appendChild(key);
+
                 }
+                const backspaceBtn = document.createElement('button');
+                backspaceBtn.className = 'key backspace-key';
+                backspaceBtn.textContent = '←';
+                backspaceBtn.style.flex = '1';
+
+                if (!gameState.gameOver) {
+                    backspaceBtn.addEventListener('click', () => removeLetter());
+                } else {
+                    backspaceBtn.classList.add('disabled');
+                }
+
+                if(index === keyboardRows.length - 1) {
+                    rowDiv.appendChild(backspaceBtn);
+                }
+
                 keyboard.appendChild(rowDiv);
             }
 
-            // Add Backspace button on its own row
-            const backspaceRow = document.createElement('div');
-            backspaceRow.className = 'keyboard-row';
-
-            const backspaceBtn = document.createElement('button');
-            backspaceBtn.className = 'key backspace-key';
-            backspaceBtn.textContent = '← Back';
-            backspaceBtn.style.flex = '1';
-
-            if (!gameState.gameOver) {
-                backspaceBtn.addEventListener('click', () => removeLetter());
-            } else {
-                backspaceBtn.classList.add('disabled');
-            }
-
-            backspaceRow.appendChild(backspaceBtn);
-            keyboard.appendChild(backspaceRow);
         }
 
         // Render keyboard

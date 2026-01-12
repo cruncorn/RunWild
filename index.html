@@ -1,334 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RunWild</title>
     <style>
-body {
-    font-family: Arial, sans-serif;
-    background-color: #2196F3;
-    color: white;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-}
+        /* --- Default Button Styles (Desktop First Approach) --- */
+        .mobile-btn {
+            background-color: #007bff;
+            /* Blue background */
+            color: white;
+            /* White text */
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 5px;
+            display: inline-block;
+            /* Ensures it plays well with margins */
+            margin: 10px;
+            width: auto;
+            /* Default width */
+        }
 
-body.player2 {
-    background-color: pink;
-}
+        .mobile-btn:hover {
+            background-color: #0056b3;
+        }
 
-body.player3 {
-    background-color: teal;
-}
-
-#game-container {
-    text-align: center;
-    max-width: 100vw;
-    padding: 10px;
-}
-
-h1 {
-    margin-bottom: 10px;
-    font-size: 32px;
-}
-
-p {
-    margin-bottom: 15px;
-    font-size: 18px;
-}
-
-#player-selection {
-    margin-bottom: 15px;
-}
-
-#player-selection div {
-    margin-bottom: 10px;
-}
-
-#player-selection select {
-    font-size: 16px;
-    padding: 8px;
-}
-
-#start-game {
-    padding: 12px 24px;
-    font-size: 18px;
-    background-color: #2196F3;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-#game-board {
-    display: none;
-}
-
-#game-board:not(.hidden) {
-    display: block;
-}
-
-#scores {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 10px;
-}
-
-.score {
-    margin: 0 10px;
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.hidden {
-    display: none;
-}
-
-#grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    grid-template-rows: repeat(7, 1fr);
-    gap: 5px;
-    width: 90vw;
-    height: 90vw * 7 / 6;
-    max-width: 90vw;
-    margin: 0 auto;
-}
-
-.tile {
-    background-color: #ccc;
-    border-radius: 5px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 3rem;
-    cursor: pointer;
-    user-select: none;
-    transition: transform 0.3s;
-    aspect-ratio: 1 / 1;
-}
-
-.tile.flipped {
-    background-color: white;
-    color: black;
-}
-
-.tile.matched {
-    pointer-events: none;
-}
-
-.tile.matched-player1 {
-    background-color: #1976D2;
-}
-
-.tile.matched-player2 {
-    background-color: #ff69b4;
-}
-
-.tile.matched-player3 {
-    background-color: #008080;
-}
-
-#current-player {
-    margin-top: 15px;
-    font-size: 24px;
-    font-weight: bold;
-}
-
-#new-game {
-    margin-top: 20px;
-    padding: 12px 24px;
-    font-size: 18px;
-    background-color: #FF6B6B;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
+        /* --- Mobile-Specific Styles using Media Queries --- */
+        /* Styles for screens smaller than or equal to 600px width (typical mobile size) */
+        @media screen and (max-width: 600px) {
+            .mobile-btn {
+                width: 90%;
+                /* Button takes up most of the mobile screen width */
+                display: block;
+                /* Centers the button using margin auto when block-level */
+                margin: 15px auto;
+                /* Centers the button horizontally */
+                font-size: 16px;
+                padding: 12px 20px;
+            }
+        }
     </style>
 </head>
+
 <body>
-    <div id="game-container">
-        <h1>RunWild</h1>
-        <p>A Runcorn Family Matching Game</p>
-        <div id="player-selection">
-            <div>
-                <label for="players">Number of Players:</label>
-                <select id="players">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                </select>
-            </div>
-            <div>
-                <label for="game-mode">Game Mode:</label>
-                <select id="game-mode">
-                    <option value="bluey">Bluey's Rules</option>
-                    <option value="standard">Standard</option>
-                </select>
-            </div>
-            <button id="start-game">Start Game</button>
-        </div>
-        <div id="game-board" class="hidden">
-            <div id="scores">
-                <div class="score" id="score1">Player 1: 0</div>
-                <div class="score hidden" id="score2">Player 2: 0</div>
-                <div class="score hidden" id="score3">Player 3: 0</div>
-            </div>
-            <div id="grid"></div>
-            <div id="current-player">Player 1's turn</div>
-            <button id="new-game">New Game</button>
-        </div>
-    </div>
-    <script>
-const animals = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐸', '🐵', '🐔', '🐧', '🐦', '🦆', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄'];
 
-let numPlayers = 1;
-let gameMode = 'bluey';
-let currentPlayer = 1;
-let scores = [0, 0, 0];
-let flippedTiles = [];
-let matchedPairs = 0;
-let tiles = [];
-
-document.getElementById('start-game').addEventListener('click', startGame);
-document.getElementById('new-game').addEventListener('click', newGame);
-
-function startGame() {
-    numPlayers = parseInt(document.getElementById('players').value);
-    gameMode = document.getElementById('game-mode').value;
-    document.getElementById('player-selection').classList.add('hidden');
-    document.getElementById('game-board').classList.remove('hidden');
-    
-    // Show/hide scores based on number of players
-    document.getElementById('score2').classList.toggle('hidden', numPlayers < 2);
-    document.getElementById('score3').classList.toggle('hidden', numPlayers < 3);
-    
-    document.body.className = 'player1';
-    createGrid();
-    updateCurrentPlayer();
-}
-
-function createGrid() {
-    const grid = document.getElementById('grid');
-    grid.innerHTML = '';
-    const shuffledAnimals = shuffle([...animals.slice(0, 21), ...animals.slice(0, 21)]);
-    for (let i = 0; i < 42; i++) {
-        const tile = document.createElement('div');
-        tile.classList.add('tile');
-        tile.dataset.animal = shuffledAnimals[i];
-        tile.addEventListener('click', () => flipTile(tile));
-        grid.appendChild(tile);
-        tiles.push(tile);
-    }
-}
-
-function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-}
-
-function flipTile(tile) {
-    if (tile.classList.contains('flipped') || tile.classList.contains('matched') || flippedTiles.length >= 2) return;
-    tile.classList.add('flipped');
-    tile.textContent = tile.dataset.animal;
-    flippedTiles.push(tile);
-    if (flippedTiles.length === 2) {
-        setTimeout(checkMatch, 1000);
-    }
-}
-
-
-function getWinners(players) {
-
-  if (players.length === 0) return [];
-
-  let maxScore = -Infinity;
-  for (const player of players) {
-    if (player.score > maxScore) {
-      maxScore = player.score;
-    }
-  }
-
-  // Filter for all players who achieved the maximum score
-  const winners = players.filter(player => player.score === maxScore);
-
-  if (winners.length > 1) {
-    // Handle tiebreaker logic here if needed
-    return { status: "It's a Tie"};
-  } else {
-    return { status: winners[0].name + " Wins" };
-  }
-}
-
-function checkMatch() {
-    const [tile1, tile2] = flippedTiles;
-    if (tile1.dataset.animal === tile2.dataset.animal) {
-        tile1.classList.add('matched', `matched-player${currentPlayer}`);
-        tile2.classList.add('matched', `matched-player${currentPlayer}`);
-        scores[currentPlayer - 1]++;
-        matchedPairs++;
-        updateScores();
-        if (matchedPairs === 21) {
-            const players = [
-                { name: "Player 1", score: scores[0] },
-                { name: "Player 2", score: scores[1] },
-                { name: "Player 3", score: scores[2] }
-                ];
-            alert(`Game over! ${getWinners(players).status}`);
-        }
-        // In Standard mode, switch players after a match
-        if (gameMode === 'standard' && numPlayers > 1) {
-            currentPlayer = currentPlayer % numPlayers + 1;
-            updateCurrentPlayer();
-        }
-    } else {
-        tile1.classList.remove('flipped');
-        tile1.textContent = '';
-        tile2.classList.remove('flipped');
-        tile2.textContent = '';
-        // Always switch players on mismatch in both modes
-        if (numPlayers > 1) {
-            currentPlayer = currentPlayer % numPlayers + 1;
-            updateCurrentPlayer();
-        }
-    }
-    flippedTiles = [];
-}
-
-function updateScores() {
-    document.getElementById('score1').textContent = `Player 1: ${scores[0]}`;
-    document.getElementById('score2').textContent = `Player 2: ${scores[1]}`;
-    document.getElementById('score3').textContent = `Player 3: ${scores[2]}`;
-}
-
-function updateCurrentPlayer() {
-    document.getElementById('current-player').textContent = `Player ${currentPlayer}'s turn`;
-    document.body.className = `player${currentPlayer}`;
-}
-
-function newGame() {
-    // Reset game state
-    currentPlayer = 1;
-    scores = [0, 0, 0];
-    matchedPairs = 0;
-    flippedTiles = [];
-    tiles = [];
-    
-    // Update score display
-    updateScores();
-    
-    // Show player selection, hide game board
-    document.getElementById('player-selection').classList.remove('hidden');
-    document.getElementById('game-board').classList.add('hidden');
-}
-    </script>
+    <!-- The simple link button -->
+    <a href="RunMatch.html" class="mobile-btn">
+        RunMatch
+    </a>
+    <br>
+    <br>
+    <a href="RunWords.html" class="mobile-btn">
+        RunWords
+    </a>
 </body>
+
 </html>

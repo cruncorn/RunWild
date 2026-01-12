@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>RunWords</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+        }
+
+        .header {
+            text-align: center;
+            padding: 12px 8px;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: clamp(1.3em, 5vw, 2.2em);
+            margin-bottom: 4px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: clamp(0.75em, 2.5vw, 0.95em);
+        }
+
+        .stats {
+            display: flex;
+            gap: 8px;
+            padding: 8px;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.95);
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 6px 10px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 4px;
+            min-width: 70px;
+
+        }
+
+        .stat-label {
+            color: #667eea;
+            font-size: clamp(0.6em, 1.5vw, 0.75em);
+            margin-bottom: 1px;
+            font-weight: 600;
+
+        }
+
+        .stat-value {
+            color: #667eea;
+            font-size: clamp(0.9em, 3vw, 1.3em);
+            font-weight: 700;
+        }
+
+        .game-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 15px 10px;
+            gap: 15px;
+            min-height: 0;
+            overflow-y: auto;
+        }
+
+        .guesses-display {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 10px;
+            padding: 10px 0;
+        }
+
+        .guess-row {
+            display: flex;
+            gap: 4px;
+
+        }
+
+        .tile {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: 700;
+            border: 2px solid white;
+            border-radius: 6px;
+            color: white;
+            background: rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+
+        .tile.filled {
+            background: rgba(255, 255, 255, 0.4);
+            border-color: white;
+        }
+
+        .tile.correct {
+            background: #4caf50;
+            border-color: #4caf50;
+            animation: popTile 0.4s ease-out;
+
+        }
+
+        .tile.present {
+            background: #ff9800;
+            border-color: #ff9800;
+            animation: popTile 0.4s ease-out;
+        }
+
+        .tile.absent {
+            background: #9e9e9e;
+            border-color: #9e9e9e;
+            animation: popTile 0.4s ease-out;
+
+        }
+
+        @keyframes popTile {
+            0% {
+                transform: scale(1) rotateX(0);
+            }
+
+            50% {
+                transform: scale(1.1) rotateX(90deg);
+            }
+
+            100% {
+                transform: scale(1) rotateX(0);
+            }
+        }
+
+        .keyboard {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 10px;
+            margin-top: 10px;
+        }
+
+        .keyboard-row {
+            display: flex;
+            gap: 3px;
+            justify-content: center;
+        }
+
+        .key {
+            padding: 8px 6px;
+            border: 2px solid white;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: clamp(0.6em, 2vw, 0.8em);
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            min-width: 30px;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .key:active {
+            transform: scale(0.95);
+        }
+
+        .key:hover {
+            background: white;
+            transform: translateY(-1px);
+        }
+
+        .key.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #e0e0e0;
+        }
+
+        .key.correct {
+            background: #4caf50;
+            border-color: #4caf50;
+            color: white;
+        }
+
+        .key.correct {
+            background: #4caf50;
+            border-color: #4caf50;
+            color: white;
+        }
+
+        .key.present {
+            background: #ff9800;
+            border-color: #ff9800;
+            color: white;
+        }
+
+        .key.absent {
+            background: #9e9e9e;
+            border-color: #9e9e9e;
+            color: white;
+        }
+
+        .key.backspace-key {
+            flex: 1;
+            max-width: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        button.action-btn {
+            padding: 8px 16px;
+            border: 2px solid white;
+            border-radius: 6px;
+            background: white;
+            color: #667eea;
+            font-weight: 600;
+            font-size: clamp(0.75em, 2vw, 0.9em);
+            cursor: pointer;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button.action-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        button.action-btn:active {
+            transform: scale(0.95);
+        }
+
+        .message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 8px;
+            border: 2px solid white;
+            font-size: 1.1em;
+            font-weight: 700;
+            display: none;
+            text-align: center;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .message.show {
+            display: block;
+            animation: messagePopup 0.5s ease-out;
+        }
+
+        .message.win {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            border-color: #4caf50;
+        }
+
+        .message.lose {
+            background: linear-gradient(135deg, #f44336 0%, #da190b 100%);
+            border-color: #f44336;
+
+        }
+
+        @keyframes messagePopup {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .letter-box {
+                width: 50px;
+                height: 50px;
+                font-size: 2em;
+                border-width: 2px;
+
+            }
+
+            .keyboard {
+                gap: 6px;
+            }
+
+            .key {
+                padding: 10px;
+                font-size: 0.95em;
+            }
+
+            .game-area {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-label">Attempts</div>
+                <div class="stat-value" id="attemptsDisplay">6</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Wins</div>
+                <div class="stat-value" id="winsDisplay">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Word</div>
+                <div class="stat-value" id="wordDisplay">???</div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="guesses-display" id="guessesDisplay"></div>
+            <div class="keyboard" id="keyboard"></div>
+            <div class="button-group">
+                <button class="action-btn" onclick="submitGuess()">Submit</button>
+                <button class="action-btn" onclick="newGame()">New Word</button>
+            </div>
+        </div>
+
+        <div class="message" id="message"></div>
+    </div>
+    <script>
+        // Third-grade appropriate 3-letter words
+        const WORD_LIST = [
+            'CAT', 'DOG', 'BAT', 'RAT',
+            'HAT', 'BIG', 'BAD', 'SAD',
+            'MAD', 'LAD', 'RAN', 'PAN',
+            'FAN', 'CAN', 'TAN', 'SUN',
+            'FUN', 'BUN', 'RUN', 'GUN',
+            'BOX', 'FOX', 'MIX', 'SIX',
+            'FIX', 'EYE', 'BYE', 'RYE',
+            'PIE', 'TIE', 'BED', 'RED',
+            'FED', 'WED', 'BIT', 'HIT',
+            'SIT', 'PIT', 'WIT', 'TOP',
+            'COP', 'HOP', 'MOP', 'POP',
+            'JAM', 'HAM', 'BAY', 'DAY',
+            'DAM', 'GYM', 'ARM', 'JAY',
+            'LAY', 'PAY', 'CAP', 'CUP',
+            'LAP', 'MAP', 'NAP', 'HIP',
+            'TAP', 'PUP', 'DIP', 'ZIP',
+            'AGE', 'AGO', 'AIR', 'ALL',
+            'AND', 'ANT', 'ANY', 'APE',
+            'APP', 'ARC', 'ARE', 'ART',
+            'ASH', 'ASK', 'AWE', 'ALE',
+            'AIM', 'AID', 'ALP', 'ALY',
+            'BAG', 'BUG', 'CAB', 'COT',
+            'BID', 'BOG', 'WIN', 'EVE',
+            'CUD', 'DUG', 'EEL', 'EGO',
+            'ELK', 'ELM', 'EMU', 'FAD',
+            'FAR', 'GAP', 'GAS', 'WIG',
+            'GUM', 'HAD', 'HEN', 'ICE',
+            'INK', 'JAR', 'JET', 'KID',
+            'KIT', 'LOG', 'LOT', 'NOT',
+            'MOB', 'NOD', 'OAK', 'OAR',
+            'OWL', 'PAD', 'PEN', 'PET',
+            'PIG', 'POD', 'POT', 'QUO',
+            'RIB', 'RID', 'ROB', 'SAG',
+            'SAP', 'SIP', 'TAB', 'TUG',
+            'VAN', 'VET', 'WAD', 'WAX',
+            'WEB', 'YAK', 'YAM', 'ZAP',
+            'ZEN', 'ZIG', 'ZOO', 'JUG',
+            'JOT', 'JAW', 'GIN', 'JAB',
+            'WON', 'WOK', 'WEE', 'ACE',
+            'ACT', 'ADD', 'ART', 'ATE',
+            'AGO', 'ALE', 'ARM', 'BED',
+            'BAD', 'BAG', 'BAT', 'BAY',
+            'BEE', 'BET', 'BIG', 'BIT',
+            'BOX', 'BOY', 'BUG', 'BUS',
+            'BUT', 'BUY', 'DIG', 'DOG',
+            'CAP', 'CAR', 'CAT', 'EGG',
+            'COW', 'CRY', 'CUP', 'END',
+            'DAD', 'DAM', 'EYE', 'FAD',
+            'DAY', 'DID', 'DIE', 'FAN',
+            'DOT', 'DRY', 'EAR', 'EAT',
+            'FAR', 'FAT', 'RAY', 'FEW',
+            'FIT', 'FLY', 'FOR', 'FOX',
+            'FUN', 'GAP', 'GAS', 'GET',
+            'GOD', 'GOT', 'GUN', 'GUY',
+            'HAD', 'HAM', 'HAS', 'HER',
+            'HID', 'HIM', 'HIS', 'HIT',
+            'HOT', 'HOW', 'JOB', 'KEY',
+            'LAP', 'LAY', 'LEG', 'LIP',
+            'LET', 'LID', 'LIE', 'LOG',
+            'LOT', 'LOW', 'MAD', 'MAN',
+            'MAP', 'MAT', 'MAY', 'MEN',
+            'MET', 'MIX', 'MOM', 'MUD',
+            'NEW', 'NOR', 'ODD', 'OFF',
+            'OIL', 'OLD', 'ONE', 'PIG',
+            'OUR', 'OUT', 'PEA', 'RED',
+            'OWE', 'OWL', 'OWN', 'ROD',
+            'PAN', 'PAT', 'PAW', 'PAY',
+            'PEG', 'PER', 'PUT', 'RAN',
+            'PIN', 'PIT', 'RAT', 'RAW',
+            'RID', 'ROT', 'ROW', 'RUB',
+            'RUG', 'RUN', 'SAD', 'SAT',
+            'SAW', 'SAY', 'SEA', 'SEE',
+            'SET', 'SHE', 'SIT', 'SIX',
+            'SKY', 'SOB', 'SON', 'SUN',
+            'TAN', 'TAP', 'TAX',
+            'TEA', 'TEN', 'THE', 'TIE',
+            'TIN', 'TIP', 'TOE', 'TOO',
+            'TOP', 'TOY', 'TRY', 'TWO',
+            'USE', 'VIA', 'WAR',
+            'WAS', 'WAY', 'WHO',
+            'WHY', 'WIG', 'WIN', 'YES',
+            'YET', 'YOU', 'ZOO'
+        ];
+
+        let gameState = {
+            targetWord: '',
+            currentGuess: '',
+            attempts: 6,
+            maxAttempts: 6,
+            guesses: [],
+            gameOver: false,
+            wins: 0,
+            guessStates: [] // Track color state of each tile
+        };
+
+        const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+        // Initialize game
+        function initGame() {
+            gameState.targetWord = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
+            gameState.currentGuess = '';
+            gameState.attempts = gameState.maxAttempts;
+            gameState.guesses = [];
+            gameState.gameOver = false;
+            gameState.guessStates = Array(6).fill(null).map(() => Array(3).fill(null));
+
+            document.getElementById('attemptsDisplay').textContent = gameState.attempts;
+            document.getElementById('wordDisplay').textContent = '???';
+            renderGuesses();
+            renderKeyboard();
+        }
+
+        // Render all guesses
+        function renderGuesses() {
+            const display = document.getElementById('guessesDisplay');
+            display.innerHTML = '';
+
+            for (let row = 0; row < 6; row++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'guess-row';
+
+                for (let col = 0; col < 3; col++) {
+                    const tile = document.createElement('div');
+                    tile.className = 'tile';
+                    tile.dataset.row = row;
+                    tile.dataset.col = col;
+
+                    // Check if this is the current row being filled
+                    if (row === gameState.guesses.length) {
+                        if (col < gameState.currentGuess.length) {
+                            tile.textContent = gameState.currentGuess[col].toUpperCase();
+                            tile.classList.add('filled');
+                        }
+                        // Allow clicking on empty tiles in current row
+                        tile.style.cursor = 'pointer';
+                        if (!gameState.gameOver) {
+                            tile.addEventListener('click', () => selectTile(row, col));
+                        }
+                    }
+                    // Show completed guesses with colors
+                    else if (row < gameState.guesses.length) {
+                        const guess = gameState.guesses[row];
+                        tile.textContent = guess[col].toUpperCase();
+
+                        const state = gameState.guessStates[row][col];
+                        if (state) {
+                            tile.classList.add(state);
+
+                        }
+                    }
+
+                    rowDiv.appendChild(tile);
+                }
+                display.appendChild(rowDiv);
+            }
+        }
+        // Select a tile for input
+        function selectTile(row, col) {
+            if (row !== gameState.guesses.length) return;
+            if (col !== gameState.currentGuess.length) return;
+
+            // Focus on the selected tile (visual feedback)
+            const tile = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+            if (tile) {
+                tile.style.outline = '3px solid white';
+                tile.style.outlineOffset = '-5px';
+            }
+            // Set focus to accept keyboard input
+            document.activeElement?.blur();
+
+        }
+
+        // Render keyboard with standard QWERTY layout
+        function renderKeyboard() {
+            const keyboard = document.getElementById('keyboard');
+            keyboard.innerHTML = '';
+
+            // Standard QWERTY keyboard rows
+            const keyboardRows = [
+                ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+                ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+                ['Z', 'X', 'C', 'V', 'B', 'N', 'M']
+            ];
+
+            for (const [index, row] of keyboardRows.entries()) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'keyboard-row';
+
+                for (const letter of row) {
+                    const key = document.createElement('button');
+                    key.className = 'key';
+                    key.textContent = letter;
+
+                    // Determine the letter's state from guesses
+                    let letterState = null;
+
+                    for (const guessIndex in gameState.guesses) {
+                        const guess = gameState.guesses[guessIndex];
+                        if (guess.toUpperCase().includes(letter)) {
+                            // Find all positions of this letter in the guess
+                            let hasCorrect = false;
+                            let hasPresent = false;
+
+                            for (let i = 0; i < guess.length; i++) {
+                                if (guess.toUpperCase()[i] === letter) {
+                                    const state = gameState.guessStates[guessIndex][i];
+                                    if (state === 'correct') {
+                                        hasCorrect = true;
+                                    } else if (state === 'present') {
+                                        hasPresent = true;
+                                    }
+                                }
+                            }
+
+                            // If correct, always show correct (green)
+                            if (hasCorrect) {
+                                letterState = 'correct';
+                                break;
+                            }
+                            // Show present (orange) if letter was marked as present in any guess
+                            else if (hasPresent && letterState !== 'correct') {
+                                letterState = 'present';
+                            }
+                            // Otherwise mark as absent (gray)
+                            else if (letterState === null) {
+                                letterState = 'absent';
+                            }
+                        }
+                    }
+                    // Apply the state class if letter was guessed
+                    if (letterState) {
+                        key.classList.add(letterState);
+                    }
+
+                    if (!gameState.gameOver) {
+                        key.addEventListener('click', () => addLetter(letter));
+                    } else {
+                        key.classList.add('disabled');
+                    }
+                    rowDiv.appendChild(key);
+
+                }
+                const backspaceBtn = document.createElement('button');
+                backspaceBtn.className = 'key backspace-key';
+                backspaceBtn.textContent = '←';
+                backspaceBtn.style.flex = '1';
+
+                if (!gameState.gameOver) {
+                    backspaceBtn.addEventListener('click', () => removeLetter());
+                } else {
+                    backspaceBtn.classList.add('disabled');
+                }
+
+                if(index === keyboardRows.length - 1) {
+                    rowDiv.appendChild(backspaceBtn);
+                }
+
+                keyboard.appendChild(rowDiv);
+            }
+
+        }
+
+        // Render keyboard
+        // Add letter
+        function addLetter(letter) {
+            if (gameState.currentGuess.length < 3) {
+                gameState.currentGuess += letter;
+                renderGuesses();
+            }
+        }
+
+        // Remove letter
+        function removeLetter() {
+            gameState.currentGuess = gameState.currentGuess.slice(0, -1);
+            renderGuesses();
+        }
+
+        // Submit guess
+        function submitGuess() {
+            if (gameState.gameOver) return;
+
+            if (gameState.currentGuess.length !== 3) {
+                showMessage('Please enter a 3-letter word!');
+                return;
+            }
+
+            const guessWord = gameState.currentGuess.toUpperCase();
+
+            // Check if word is in list
+            if (!WORD_LIST.some(w => w.toUpperCase() === guessWord)) {
+                showMessage('Not a valid word!');
+                return;
+            }
+            // Check if already guessed
+            if (gameState.guesses.some(g => g.toUpperCase() === guessWord)) {
+                showMessage('Already guessed!');
+                return;
+            }
+
+            // Calculate tile colors and store them
+            const target = gameState.targetWord.toUpperCase();
+            const states = [];
+            const targetLetters = target.split(''); // Track remaining letters in target
+
+            // First pass: mark all correct letters
+            for (let i = 0; i < 3; i++) {
+                const letter = guessWord[i];
+
+                if (letter === target[i]) {
+                    states[i] = 'correct';
+                    targetLetters[i] = null; // Mark as used
+                } else {
+                    states[i] = null; // Placeholder
+                }
+            }
+
+            // Second pass: mark present and absent letters
+            for (let i = 0; i < 3; i++) {
+                if (states[i] === null) {//Not already marked as correct
+                    const letter = guessWord[i];
+                    const targetIndex = targetLetters.indexOf(letter);
+
+                    if (targetIndex !== -1) {
+                        states[i] = 'present';
+                        targetLetters[targetIndex] = null; // Mark as used
+                    } else {
+                        states[i] = 'absent';
+                    }
+                }
+            }
+
+            gameState.guessStates[gameState.guesses.length] = states;
+            gameState.guesses.push(guessWord);
+            gameState.attempts--;
+            gameState.currentGuess = '';
+
+            renderGuesses();
+
+            // Check if won
+            if (guessWord === target) {
+                gameState.gameOver = true;
+                gameState.wins++;
+                showMessage(`You Won! The word was ${target}!`, true);
+                document.getElementById('winsDisplay').textContent = gameState.wins;
+            } else if (gameState.attempts === 0) {
+                gameState.gameOver = true;
+                showMessage(`Game Over! The word was ${target}!`, false);
+            }
+            document.getElementById('attemptsDisplay').textContent = gameState.attempts;
+            renderKeyboard();
+        }
+
+        //New game
+        function newGame() {
+            initGame();
+        }
+
+        // Show message
+        function showMessage(text, isWin = false) {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.classList.add('show');
+            if (isWin) {
+                message.classList.add('win');
+            } else if (gameState.gameOver) {
+                message.classList.add('lose');
+            }
+
+            setTimeout(() => {
+                message.classList.remove('show', 'win', 'lose');
+            }, 3000);
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (gameState.gameOver) return;
+
+            const letter = e.key.toUpperCase();
+            if (ALPHABET.includes(letter)) {
+                addLetter(letter);
+                renderGuesses();
+            } else if (e.key === 'Backspace') {
+                removeLetter();
+                renderGuesses();
+            } else if (e.key === 'Enter') {
+                submitGuess();
+            }
+        });
+
+        // Initialize
+        initGame();
+    </script>
+</body>
+
+</html>

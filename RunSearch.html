@@ -372,8 +372,8 @@
                 }
 
                 calculateGridSize() {
-                    const totallength = this.words.reduce((sum, w) => sum + w.length, 0);
-                    return Math.max(Math.ceil(Math.sqrt(totallength * 1.5)), 10);
+                    const totalLength = this.words.reduce((sum, w) => sum + w.length, 0);
+                    return Math.max(Math.ceil(Math.sqrt(totalLength * 1.5)), 10);
                 }
 
                 canPlaceWord(word, row, col, dr, dc) {
@@ -611,6 +611,8 @@
                         return true;
                     }
                 }
+
+                return false;
             }
 
                 function submitSelection() {

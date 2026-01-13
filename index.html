@@ -3,24 +3,65 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>RunWild</title>
     <style>
-        /* --- Default Button Styles (Desktop First Approach) --- */
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2196F3;
+            color: white;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .container {
+            display: flex;
+            align-items: flex-start;
+            /* Aligns items to the start (top) of the container */
+        }
+
+        .default-div-class {
+            position: fixed;
+            /* Takes the div out of the normal document flow and positions it relative to the viewport */
+            top: 10px;
+            /* Aligns the top edge of the div to the top edge of the viewport */
+            left: 0;
+            /* Aligns the left edge of the div to the left edge of the viewport */
+            width: 100%;
+            /* Add padding-top to the next element if it is hidden underneath the fixed div */
+        }
+
         .mobile-btn {
             background-color: #007bff;
             /* Blue background */
             color: white;
             /* White text */
             border: none;
-            padding: 15px 30px;
-            font-size: 18px;
+            padding: 15px 180px;
+            font-size: 24px;
             cursor: pointer;
             border-radius: 5px;
             display: inline-block;
             /* Ensures it plays well with margins */
             margin: 10px;
             width: auto;
+            text-decoration: none;
             /* Default width */
         }
 
@@ -46,16 +87,27 @@
 </head>
 
 <body style="background-color:#007bff">
-    <div style="text-align: center;">
-        <!-- The simple link button -->
-        <a href="RunMatch.html" class="mobile-btn">
-            RunMatch
-        </a>
-        <br>
-        <br>
-        <a href="RunWords.html" class="mobile-btn">
-            RunWords
-        </a>
+    <div id="game-container" class="default-div-class">
+        <div id="heading" style="text-align: center;">
+            <h1><b>RunWild</b></h1>
+            <p>Classic Games for Families</p>
+        </div>
+        <div style="text-align: center;">
+            <!-- The simple link button -->
+            <a href="RunMatch.html" class="mobile-btn">
+                <b>MATCH</b>
+            </a>
+            <br>
+            <br>
+            <a href="RunWords.html" class="mobile-btn">
+                <b>WORDS</b>
+            </a>
+            <br>
+            <br>
+            <a href="runTicTacToe.html" class="mobile-btn">
+                <b>TIC-TAC-TOE</b>
+            </a>
+        </div>
     </div>
 </body>
 

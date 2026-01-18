@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Connect</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: clamp(1.5em, 6vw, 2.2em);
+            margin-bottom: 4px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .status {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: clamp(0.9em, 3vw, 1.1em);
+            font-weight: 600;
+            min-height: 1.5em;
+        }
+
+        .status.player1 {
+            color: blue;
+        }
+
+        .status.player2 {
+            color: #ff6b6b;
+        }
+
+        .game-board {
+            flex: 0 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .board-container {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            gap: 4px;
+            background: #1a3a52;
+            padding: 8px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            width: 350px;
+            height: 300px;
+        }
+
+        .tile {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-weight: 700;
+            font-size: clamp(1.5em, 5vw, 2.5em);
+        }
+
+        .tile:active {
+            transform: scale(0.95);
+        }
+
+        .tile.empty:hover {
+            background: #f0f0f0;
+        }
+
+        .tile.player1 {
+            background: blue;
+            color: white;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .tile.player2 {
+            background: #ff6b6b;
+            color: white;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .drop-zone {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.5em;
+        }
+
+        .board-container.active-column-0 .tile:nth-child(-n+7):nth-child(7n+1) ~ .tile:first-child {
+            display: none;
+        }
+
+        .controls {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            width: 100%;
+            max-width: 380px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: 2px solid white;
+            border-radius: 6px;
+            background: white;
+            color: #667eea;
+            font-weight: 600;
+            font-size: clamp(0.85em, 2.5vw, 1em);
+            cursor: pointer;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            flex: 1;
+            min-width: 45px;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        button:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .stats {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: clamp(0.8em, 2vw, 0.95em);
+            width: 100%;
+            max-width: 380px;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: white;
+            font-weight: 600;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 0.8em;
+            opacity: 0.8;
+            margin-bottom: 2px;
+        }
+
+        .stat-value {
+            font-size: 1.4em;
+            font-weight: 700;
+        }
+
+        .message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 8px;
+            border: 3px solid white;
+            font-size: clamp(1em, 4vw, 1.4em);
+            font-weight: 700;
+            z-index: 1000;
+            display: none;
+            text-align: center;
+            animation: slideIn 0.3s ease-out;
+            max-width: 90vw;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translate(-50%, -60%);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, -50%);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 8px;
+                gap: 8px;
+            }
+
+            .header {
+                margin-bottom: 4px;
+            }
+
+            .controls {
+                gap: 6px;
+            }
+
+            button {
+                padding: 8px 16px;
+                min-width: 70px;
+            }
+
+            .stats {
+                gap: 8px;
+                font-size: 0.75em;
+            }
+
+            .stat {
+                padding: 6px 12px;
+            }
+        }
+
+        @media (max-height: 700px) {
+            .container {
+                gap: 6px;
+                padding: 6px;
+            }
+
+            .header {
+                margin-bottom: 2px;
+            }
+
+            .header h1 {
+                margin-bottom: 2px;
+            }
+
+            .status {
+                min-height: auto;
+            }
+
+            .controls {
+                gap: 4px;
+            }
+
+            button {
+                padding: 6px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>RunConnect</h1>
+            <div class="status" id="status">Player 1 (Blue) - Your Turn</div>
+        </div>
+
+        <div class="game-board">
+            <div class="board-container" id="boardContainer"></div>
+        </div>
+
+        <div class="controls">
+            <button onclick="makeMove(0)">1</button>
+            <button onclick="makeMove(1)">2</button>
+            <button onclick="makeMove(2)">3</button>
+            <button onclick="makeMove(3)">4</button>
+            <button onclick="makeMove(4)">5</button>
+            <button onclick="makeMove(5)">6</button>
+            <button onclick="makeMove(6)">7</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <span class="stat-label">Player 1</span>
+                <span class="stat-value" id="playerScore">0</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Player 2</span>
+                <span class="stat-value" id="aiScore">0</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Draws</span>
+                <span class="stat-value" id="drawScore">0</span>
+            </div>
+        </div>
+
+        <button onclick="resetGame()">New Game</button>
+
+        <div class="message" id="message"></div>
+    </div>
+
+    <script>
+        const ROWS = 6;
+        const COLS = 7;
+        const PLAYER1 = 1;
+        const PLAYER2 = 2;
+        const EMPTY = 0;
+
+        let board = [];
+        let currentPlayer = PLAYER1;
+        let gameOver = false;
+        let scores = {
+            player: 0,
+            ai: 0,
+            draw: 0
+        };
+
+        const boardContainer = document.getElementById('boardContainer');
+        const statusEl = document.getElementById('status');
+        const messageEl = document.getElementById('message');
+        const playerScoreEl = document.getElementById('playerScore');
+        const aiScoreEl = document.getElementById('aiScore');
+        const drawScoreEl = document.getElementById('drawScore');
+
+        function initBoard() {
+            board = Array(ROWS).fill(null).map(() => Array(COLS).fill(EMPTY));
+            currentPlayer = PLAYER1;
+            gameOver = false;
+            renderBoard();
+            updateStatus();
+        }
+
+        function renderBoard() {
+            boardContainer.innerHTML = '';
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    const tile = document.createElement('div');
+                    const piece = board[r][c];
+                    tile.className = 'tile';
+                    if (piece === EMPTY) {
+                        tile.classList.add('empty');
+                    } else if (piece === PLAYER1) {
+                        tile.classList.add('player1');
+                        tile.textContent = '●';
+                    } else {
+                        tile.classList.add('player2');
+                        tile.textContent = '●';
+                    }
+                    boardContainer.appendChild(tile);
+                }
+            }
+        }
+
+        function updateStatus() {
+            if (gameOver) {
+                // Status will be set by game end logic
+                return;
+            }
+            const playerName = currentPlayer === PLAYER1 ? 'Player 1 (Blue))' : 'Player 2 (Red)';
+            statusEl.textContent = `${playerName} - Your Turn`;
+            statusEl.className = `status ${currentPlayer === PLAYER1 ? 'player1' : 'player2'}`;
+        }
+
+        function canMoveColumn(col) {
+            return board[0][col] === EMPTY;
+        }
+
+        function dropPiece(col) {
+            if (!canMoveColumn(col)) return false;
+
+            for (let r = ROWS - 1; r >= 0; r--) {
+                if (board[r][col] === EMPTY) {
+                    board[r][col] = currentPlayer;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function checkWin(player) {
+            // Check horizontal
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS - 3; c++) {
+                    if (board[r][c] === player &&
+                        board[r][c + 1] === player &&
+                        board[r][c + 2] === player &&
+                        board[r][c + 3] === player) {
+                        return true;
+                    }
+                }
+            }
+
+            // Check vertical
+            for (let c = 0; c < COLS; c++) {
+                for (let r = 0; r < ROWS - 3; r++) {
+                    if (board[r][c] === player &&
+                        board[r + 1][c] === player &&
+                        board[r + 2][c] === player &&
+                        board[r + 3][c] === player) {
+                        return true;
+                    }
+                }
+            }
+
+            // Check diagonal (down-right)
+            for (let r = 0; r < ROWS - 3; r++) {
+                for (let c = 0; c < COLS - 3; c++) {
+                    if (board[r][c] === player &&
+                        board[r + 1][c + 1] === player &&
+                        board[r + 2][c + 2] === player &&
+                        board[r + 3][c + 3] === player) {
+                        return true;
+                    }
+                }
+            }
+
+            // Check diagonal (down-left)
+            for (let r = 0; r < ROWS - 3; r++) {
+                for (let c = 3; c < COLS; c++) {
+                    if (board[r][c] === player &&
+                        board[r + 1][c - 1] === player &&
+                        board[r + 2][c - 2] === player &&
+                        board[r + 3][c - 3] === player) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        function isBoardFull() {
+            for (let c = 0; c < COLS; c++) {
+                if (board[0][c] === EMPTY) return false;
+            }
+            return true;
+        }
+
+        function endGame(result) {
+            gameOver = true;
+            if (result === 'player1') {
+                scores.player++;
+                showMessage('Player 1 Wins!');
+                statusEl.textContent = 'Player 1 Wins!';
+            } else if (result === 'player2') {
+                scores.ai++;
+                showMessage('Player 2 Wins!');
+                statusEl.textContent = 'Player 2 Wins!';
+            } else {
+                scores.draw++;
+                showMessage("It's a Draw!");
+                statusEl.textContent = "It's a Draw!";
+            }
+            updateScores();
+        }
+
+        function makeMove(col) {
+            if (gameOver || currentPlayer === null) return;
+
+            if (!canMoveColumn(col)) {
+                showMessage('Column full!');
+                return;
+            }
+
+            dropPiece(col);
+            renderBoard();
+
+            if (checkWin(PLAYER1)) {
+                endGame('player1');
+                return;
+            }
+
+            if (checkWin(PLAYER2)) {
+                endGame('player2');
+                return;
+            }
+
+            if (isBoardFull()) {
+                endGame('draw');
+                return;
+            }
+
+            // Switch player
+            currentPlayer = currentPlayer === PLAYER1 ? PLAYER2 : PLAYER1;
+            updateStatus();
+        }
+
+
+        function updateScores() {
+            playerScoreEl.textContent = scores.player;
+            aiScoreEl.textContent = scores.ai;
+            drawScoreEl.textContent = scores.draw;
+        }
+
+        function showMessage(text) {
+            messageEl.textContent = text;
+            messageEl.classList.add('show');
+            setTimeout(() => {
+                messageEl.classList.remove('show');
+            }, 2000);
+        }
+
+        function resetGame() {
+            initBoard();
+        }
+
+        // Initialize game
+        initBoard();
+    </script>
+</body>
+</html>

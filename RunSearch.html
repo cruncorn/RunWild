@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
@@ -166,9 +167,9 @@
 
         .words-list {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             gap: 8px;
-            overflow-y: auto;
+            overflow-y: scroll;
             flex: 1;
         }
 
@@ -247,6 +248,7 @@
                 transform: translate(-50%, -60%);
                 opacity: 0;
             }
+
             to {
                 transform: translate(-50%, -50%);
                 opacity: 1;
@@ -279,27 +281,29 @@
                 padding: 6px;
             }
         }
-            @media (max-width: 500px) {
-                .stats {
-                    gap: 10px;
-                    padding: 6px;
-                }
 
-                .stat-value {
-                    font-size: 1em;
-                }
-
-                .words-list {
-                    gap: 6px;
-                }
-
-                .word-item {
-                    padding: 6px;
-                    font-size: 0.8em;
-                }
+        @media (max-width: 500px) {
+            .stats {
+                gap: 10px;
+                padding: 6px;
             }
+
+            .stat-value {
+                font-size: 1em;
+            }
+
+            .words-list {
+                gap: 6px;
+            }
+
+            .word-item {
+                padding: 6px;
+                font-size: 0.8em;
+            }
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -326,13 +330,13 @@
                     <button onclick="clearSelection()">Clear</button>
                     <button onclick="newPuzzle()">New Puzzle</button>
                 </div>
-            </div>
-
-            <div class="words-section">
-                <div class="words-title">Words</div>
-                <div class="words-list" id="wordsList">
+                <div class="words-section">
+                    <div class="words-list" id="wordsList">
+                    </div>
                 </div>
             </div>
+
+
 
             <div class="message" id="message"></div>
         </div>
@@ -356,7 +360,7 @@
                 ['FOOD', 'PIZZA', 'BURGER', 'SALAD', 'PASTA', 'SUSHI', 'TACO', 'SOUP'],
                 ['DAYS', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'],
                 ['MONTHS', 'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY'],
-                ['MONTHS', 'JUNE', 'JULY','AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'],
+                ['MONTHS', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'],
                 ['FAMILY', 'MOTHER', 'FATHER', 'SISTER', 'BROTHER', 'GRANDMA', 'GRANDPA', 'COUSIN'],
                 ['BODY', 'HEAD', 'ARM', 'LEG', 'HAND', 'FOOT', 'EYE', 'EAR'],
                 ['NATURE', 'TREE', 'FLOWER', 'RIVER', 'MOUNTAIN', 'OCEAN', 'FOREST', 'DESERT'],
@@ -611,7 +615,7 @@
             function checkWord() {
                 const selectedWord = selectedCells.map(([r, c]) => grid[r][c]).join('');
                 const selectedWordReverse = selectedWord.split('').reverse().join('');
-            
+
                 for (const wordPos of grid.wordPositions) {
                     if (wordPos.word === selectedWord || wordPos.word === selectedWordReverse) {
                         if (!foundWords.has(wordPos.word)) {
@@ -634,53 +638,54 @@
                 return false;
             }
 
-                function submitSelection() {
-                    if (selectedCells.length === 0) {
-                        showMessage('Select at least one letter!');
-                        return;
+            function submitSelection() {
+                if (selectedCells.length === 0) {
+                    showMessage('Select at least one letter!');
+                    return;
+                }
+
+                if (checkWord()) {
+                    // Word found selection is cleared in checkword()
+                } else {
+                    showMessage("Not a valid word!");
+                    // Keep selection visible so user can modify it
+                }
+            }
+
+            function clearSelection() {
+                selectedCells = [];
+                updateGridHighlight();
+            }
+
+            function renderWordsList() {
+                wordsList.innerHTML = '';
+                currentWords.forEach(word => {
+                    const wordEl = document.createElement('div');
+                    wordEl.className = 'word-item';
+                    if (foundWords.has(word)) {
+                        wordEl.classList.add('found');
                     }
+                    wordEl.textContent = word;
+                    wordsList.appendChild(wordEl);
+                });
+            }
 
-                    if (checkWord()) {
-                        // Word found selection is cleared in checkword()
-                    } else {
-                        showMessage("Not a valid word!");
-                        // Keep selection visible so user can modify it
-                    }
-                }
+            function updateStats() {
+                foundCountEl.textContent = foundWords.size;
+                totalCountEl.textContent = currentWords.length;
+            }
 
-                function clearSelection() {
-                    selectedCells = [];
-                    updateGridHighlight();
-                }
+            function showMessage(text) {
+                message.textContent = text;
+                message.classList.add('show');
+                setTimeout(() => {
+                    message.classList.remove('show');
+                }, 2000);
+            }
 
-                function renderWordsList() {
-                    wordsList.innerHTML = '';
-                    currentWords.forEach(word => {
-                        const wordEl = document.createElement('div');
-                        wordEl.className = 'word-item';
-                        if (foundWords.has(word)) {
-                            wordEl.classList.add('found');
-                        }
-                        wordEl.textContent = word;
-                        wordsList.appendChild(wordEl);
-                    });
-                }
-
-                function updateStats() {
-                    foundCountEl.textContent = foundWords.size;
-                    totalCountEl.textContent = currentWords.length;
-                }
-
-                function showMessage(text) {
-                    message.textContent = text;
-                    message.classList.add('show');
-                    setTimeout(() => {
-                        message.classList.remove('show');
-                    }, 2000);
-                }
-
-                // Start game
-                newPuzzle();        
+            // Start game
+            newPuzzle();        
         </script>
 </body>
+
 </html>

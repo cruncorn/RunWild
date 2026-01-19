@@ -141,17 +141,17 @@
         }
 
         .controls {
-            display: flex;
-            gap: 8px;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
             justify-content: center;
             flex-shrink: 0;
-            flex-wrap: wrap;
-            width: 100%;
-            max-width: 380px;
+            width: 350px;
+            padding: 0 8px;
         }
 
         button {
-            padding: 10px 20px;
+            padding: 10px 0;
             border: 2px solid white;
             border-radius: 6px;
             background: white;
@@ -162,8 +162,9 @@
             transition: all 0.2s;
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
-            flex: 1;
-            min-width: 45px;
+            width: 100%;
+            text-align: center;
+            height: 40px;
         }
 
         button:active {
@@ -180,14 +181,19 @@
             cursor: not-allowed;
         }
 
+        .new-game-btn {
+            width: 350px;
+            height: 40px;
+            grid-column: span 7;
+        }
+
         .stats {
             display: flex;
             gap: 12px;
             justify-content: center;
             flex-shrink: 0;
             font-size: clamp(0.8em, 2vw, 0.95em);
-            width: 100%;
-            max-width: 380px;
+            width: 350px;
         }
 
         .stat {
@@ -309,20 +315,6 @@
             <div class="status" id="status">Player 1 (Blue) - Your Turn</div>
         </div>
 
-        <div class="game-board">
-            <div class="board-container" id="boardContainer"></div>
-        </div>
-
-        <div class="controls">
-            <button onclick="makeMove(0)">1</button>
-            <button onclick="makeMove(1)">2</button>
-            <button onclick="makeMove(2)">3</button>
-            <button onclick="makeMove(3)">4</button>
-            <button onclick="makeMove(4)">5</button>
-            <button onclick="makeMove(5)">6</button>
-            <button onclick="makeMove(6)">7</button>
-        </div>
-
         <div class="stats">
             <div class="stat">
                 <span class="stat-label">Player 1</span>
@@ -338,7 +330,21 @@
             </div>
         </div>
 
-        <button onclick="resetGame()">New Game</button>
+        <div class="game-board">
+            <div class="board-container" id="boardContainer"></div>
+        </div>
+
+        <div class="controls">
+            <button onclick="makeMove(0)">1</button>
+            <button onclick="makeMove(1)">2</button>
+            <button onclick="makeMove(2)">3</button>
+            <button onclick="makeMove(3)">4</button>
+            <button onclick="makeMove(4)">5</button>
+            <button onclick="makeMove(5)">6</button>
+            <button onclick="makeMove(6)">7</button>
+        </div>
+
+        <button class="new-game-btn" onclick="resetGame()">New Game</button>
 
         <div class="message" id="message"></div>
     </div>

@@ -474,13 +474,15 @@
 
             function newPuzzle() {
                 const wordList = WORD_LISTS[Math.floor(Math.random() * WORD_LISTS.length)];
-                currentWords = wordList;
                 foundWords.clear();
                 selectedCells = [];
 
-                const generator = new WordSearchGenerator(currentWords);
+                const generator = new WordSearchGenerator(wordList);
                 const result = generator.generate();
                 grid = result.grid;
+
+                // Only keep words that were successfully placed on the grid
+                currentWords = result.words;
 
                 // Store word positions for checking
                 grid.wordPositions = result.positions.map(wp => ({

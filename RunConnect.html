@@ -65,27 +65,40 @@
             color: #ff6b6b;
         }
 
-        .game-board {
-            flex: 0 0 auto;
+        .game-wrapper {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            gap: 12px;
             align-items: center;
-            width: 100%;
-            max-width: 100%;
+            width: 350px;
+            max-width: calc(100vw - 16px);
+            flex: 0 0 auto;
         }
 
-        .board-container {
+        .game-board {
+            flex: 0 0 auto;
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            grid-template-rows: repeat(6, 1fr);
+            grid-template-rows: repeat(6, 1fr) auto;
             gap: 4px;
             background: #1a3a52;
             padding: 8px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            width: 350px;
-            height: 300px;
-            max-width: calc(100vw - 16px);
+            width: 100%;
+            max-width: 100%;
+            aspect-ratio: 7 / 6.5;
+        }
+
+        .board-container {
+            grid-column: 1 / -1;
+            grid-row: 1 / 7;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            gap: 4px;
+            width: 100%;
+            height: 100%;
         }
 
         .tile {
@@ -144,14 +157,9 @@
         }
 
         .controls {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
-            justify-content: center;
-            flex-shrink: 0;
-            width: 100%;
-            max-width: 334px;
-            padding: 0;
+            grid-column: 1 / -1;
+            grid-row: 7;
+            display: contents;
         }
 
         button {
@@ -166,10 +174,9 @@
             transition: all 0.2s;
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
-            width: 100%;
             text-align: center;
             height: 40px;
-            grid-column: span 1;
+            width: 100%;
         }
 
         button:active {
@@ -187,10 +194,9 @@
         }
 
         .new-game-btn {
-            width: 334px;
+            width: 100%;
             height: 40px;
-            grid-column: span 7;
-            max-width: calc(100vw - 16px);
+            margin-top: 12px;
         }
 
         .stats {
@@ -270,12 +276,14 @@
             }
 
             .controls {
-                gap: 6px;
+                gap: 4px;
+                width: calc(100vw - 16px);
+                max-width: calc(100vw - 16px);
             }
 
             button {
-                padding: 8px 16px;
-                min-width: 70px;
+                padding: 6px 4px;
+                min-width: 0;
             }
 
             .stats {
@@ -339,22 +347,21 @@
             </div>
         </div>
 
-        <div class="game-board">
-            <div class="board-container" id="boardContainer"></div>
-        </div>
-        <div class="game-board">
-            <div class="controls" width="350">
-                <button onclick="makeMove(0)">1</button>
-                <button onclick="makeMove(1)">2</button>
-                <button onclick="makeMove(2)">3</button>
-                <button onclick="makeMove(3)">4</button>
-                <button onclick="makeMove(4)">5</button>
-                <button onclick="makeMove(5)">6</button>
-                <button onclick="makeMove(6)">7</button>
+        <div class="game-wrapper">
+            <div class="game-board">
+                <div class="board-container" id="boardContainer"></div>
+                <div class="controls">
+                    <button onclick="makeMove(0)">1</button>
+                    <button onclick="makeMove(1)">2</button>
+                    <button onclick="makeMove(2)">3</button>
+                    <button onclick="makeMove(3)">4</button>
+                    <button onclick="makeMove(4)">5</button>
+                    <button onclick="makeMove(5)">6</button>
+                    <button onclick="makeMove(6)">7</button>
+                </div>
             </div>
+            <button class="new-game-btn" onclick="resetGame()">New Game</button>
         </div>
-
-        <button class="new-game-btn" onclick="resetGame()">New Game</button>
 
         <div class="message" id="message"></div>
     </div>

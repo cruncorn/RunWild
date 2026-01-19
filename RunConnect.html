@@ -511,11 +511,11 @@
         function endGame(result) {
             gameOver = true;
             if (result === 'player1') {
-                scores.player++;
+                scores.player1++;
                 showMessage('Player 1 Wins!');
                 statusEl.textContent = 'Player 1 Wins!';
             } else if (result === 'player2') {
-                scores.ai++;
+                scores.player2++;
                 showMessage('Player 2 Wins!');
                 statusEl.textContent = 'Player 2 Wins!';
             } else {

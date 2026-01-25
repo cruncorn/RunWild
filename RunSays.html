@@ -343,7 +343,7 @@
                 playSound(color);
                 setTimeout(() => {
                     button.classList.remove('active');
-                    setTimeout(resolve, 100);
+                    resolve();
                 }, duration);
             });
         }

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>RunSays</title>
+    <style>
+        * {
+
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            overflow: hidden;
+        }
+
+        .header {
+            text-align: center;
+            padding: 12px 8px;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .header h1 {
+            color: #00ff88;
+            font-size: clamp(1.3em, 5vw, 2.2em);
+            margin-bottom: 2px;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+
+        }
+
+        .header p {
+            color: rgba(0, 255, 136, 0.7);
+            font-size: clamp(0.75em, 3vw, 0.95em);
+        }
+
+        .controls {
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            background: rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+        }
+
+        button {
+            padding: 6px 14px;
+            border: 2px solid #00ff88;
+            border-radius: 4px;
+            font-size: clamp(0.7em, 2vw, 0.9em);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: transparent;
+            color: #00ff88;
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        button:hover {
+            background: rgba(0, 255, 136, 0.1);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .stats {
+            display: flex;
+            gap: 8px;
+            padding: 8px;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 8px 12px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            border-radius: 4px;
+            min-width: 80px;
+        }
+
+        .stat-label {
+            color: rgba(0, 255, 136, 0.7);
+            font-size: clamp(0.6em, 1.5vw, 0.75em);
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            color: #00ff88;
+            font-size: clamp(1em, 3vw, 1.4em);
+            font-weight: 700;
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 4px;
+            padding: 8px;
+            flex: 1;
+            max-width: 100%;
+            max-height: 100%;
+            aspect-ratio: 1;
+            margin: auto;
+        }
+
+        .simon-button {
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.1s;
+            position: relative;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .simon-button:active:not(:disabled) {
+            transform: scale(0.95);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .simon-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* Red - Top Left */
+        .red {
+            background: linear-gradient(135deg, #ff1744 0%, #d32f2f 100%);
+            grid-column: 1;
+            grid-row: 1;
+        }
+
+        .red.active {
+            background: linear-gradient(135deg, #ff5252 0%, #ff1744 100%);
+            box-shadow: 0 4px 15px rgba(255, 23, 68, 0.7), inset 0 0 30px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Blue - Top Right */
+        .blue {
+            background: linear-gradient(135deg, #2979f3 0%, #1565c0 100%);
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        .blue.active {
+            background: linear-gradient(135deg, #42a5f5 0%, #2979f3 100%);
+            box-shadow: 0 4px 15px rgba(41, 121, 243, 0.7), inset 0 0 30px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Yellow - Bottom Left */
+        .yellow {
+            background: linear-gradient(135deg, #ffea00 0%, #f57f17 100%);
+            grid-column: 1;
+            grid-row: 2;
+
+        }
+
+        .yellow.active {
+            background: linear-gradient(135deg, #ffff52 0%, #ffea00 100%);
+            box-shadow: 0 4px 15px rgba(255, 234, 0, 0.7), inset 0 0 30px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Green - Bottom Right */
+        .green {
+            background: linear-gradient(135deg, #00e676 0%, #00c853 100%);
+            grid-column: 2;
+            grid-row: 2;
+        }
+
+        .green.active {
+            background: linear-gradient(135deg, #76ff03 0%, #00e676 100%);
+            box-shadow: 0 4px 15px rgba(0, 230, 118, 0.7), inset 0 0 30px rgba(255, 255, 255, 0.2);
+        }
+
+        .message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: #00ff88;
+            padding: 20px 30px;
+            border-radius: 8px;
+            border: 2px solid #00ff88;
+            font-size: 1.2em;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.7);
+            display: none;
+            text-align: center;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .message.show {
+            display: block;
+            animation: messagePopup 0.5s ease-out;
+
+        }
+
+        @keyframes messagePopup {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .message.game-over {
+            color: #ff1744;
+            border-color: #ff1744;
+            text-shadow: 0 0 10px rgba(255, 23, 68, 0.7);
+        }
+
+        @media (max-width: 600px) {
+            .game-board {
+                gap: 2px;
+                padding: 4px;
+            }
+
+            .simon-button {
+                border-radius: 4px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1> RUNSAYS</h1>
+            <p>Watch the pattern and repeat!</p>
+        </div>
+        <div class="controls">
+            <button onclick="startGame()">Start Game</button>
+            <button onclick="resetGame()">Reset</button>
+        </div>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-label">Level</div>
+                <div class="stat-value" id="levelDisplay">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Sequence</div>
+                <div class="stat-value" id="sequenceDisplay">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Status</div>
+                <div class="stat-value" id="statusDisplay">Ready</div>
+            </div>
+        </div>
+        <div class="game-board" id="gameBoard">
+            <button class="simon-button red" data-color="red"></button>
+            <button class="simon-button blue" data-color="blue"></button>
+            <button class="simon-button yellow" data-color="yellow"></button>
+            <button class="simon-button green" data-color="green"></button>
+        </div>
+        <div class="message" id="message"></div>
+    </div>
+    <script>
+        // Game state
+        let gameState = {
+            sequence: [],
+            userSequence: [],
+            level: 0,
+            gameActive: false,
+            isPlayingSequence: false,
+            speed: 500
+        };
+        // Sound frequencies (in Hz)
+        const sounds = {
+            red: 261.63,
+            blue: 329.63,
+            yellow: 392.00,
+            green: 523.25
+        };
+        // Audio context for sound
+        let audioContext = null;
+        // Initialize audio context on first interaction
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+        // Play sound for a button
+        function playSound(color) {
+            initAudio();
+            const frequency = sounds[color];
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.value = frequency;
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
+
+        }
+        // Flash a button
+        function flashButton(color, duration = 300) {
+            return new Promise((resolve) => {
+                const button = document.querySelector(`.simon-button.${color}`);
+                button.classList.add('active');
+                playSound(color);
+                setTimeout(() => {
+                    button.classList.remove('active');
+                    setTimeout(resolve, 100);
+                }, duration);
+            });
+        }
+        // Play the sequence
+        async function playSequence() {
+            gameState.isPlayingSequence = true;
+            document.getElementById('statusDisplay').textContent = 'Watch ... ';
+            updateAllButtons(true);
+            await new Promise(resolve => setTimeout(resolve, 500));
+            for (let i = 0; i < gameState.sequence.length; i++) {
+                await flashButton(gameState.sequence[i]);
+                await new Promise(resolve => setTimeout(resolve, 200));
+            }
+            gameState.isPlayingSequence = false;
+            document.getElementById('statusDisplay').textContent = 'Your Turn!';
+            updateAllButtons(false);
+        }
+        // Handle button click
+        async function onButtonClick(e) {
+            if (!gameState.gameActive || gameState.isPlayingSequence) return;
+            const button = e.target
+            const color = button.dataset.color;
+            if (!color) return;
+            gameState.userSequence.push(color);
+            await flashButton(color, 150);
+            // Check if user's sequence is correct
+            const index = gameState.userSequence.length - 1;
+            if (gameState.userSequence[index] !== gameState.sequence[index]) {
+                endGame();
+                return;
+            }
+            // Check if user completed the sequence
+            if (gameState.userSequence.length === gameState.sequence.length) {
+                document.getElementById('statusDisplay').textContent = 'Level Complete!';
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                nextLevel();
+            }
+        }
+        // Next level
+        async function nextLevel() {
+            gameState.level++;
+            gameState.userSequence = [];
+            // Add random color to sequence
+            const colors = ['red', 'blue', 'yellow', 'green'];
+            gameState.sequence.push(colors[Math.floor(Math.random() * 4)]);
+            updateDisplay();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            playSequence();
+        }
+        // Start game
+        function startGame() {
+            if (gameState.gameActive) return;
+            gameState.sequence = [];
+            gameState.userSequence = [];
+            gameState.level = 0;
+            gameState.gameActive = true;
+            gameState.isPlayingSequence = false;
+            updateDisplay();
+            nextLevel();
+        }
+        // End game
+        function endGame() {
+            gameState.gameActive = false;
+            updateAllButtons(true);
+            document.getElementById('statusDisplay').textContent = 'Game Over!';
+            showMessage(`Game Over! Level: ${gameState.level}`, true);
+        }
+        // Reset game
+        function resetGame() {
+            gameState.gameActive = false;
+            gameState.sequence = [];
+            gameState.userSequence = [];
+            gameState.level = 0;
+            gameState.isPlayingSequence = false;
+            updateDisplay();
+            updateAllButtons(false);
+            document.getElementById('statusDisplay').textContent = 'Ready';
+            document.getElementById('message').classList.remove('show', 'game-over');
+
+        }
+        // Update display
+        function updateDisplay() {
+            document.getElementById('levelDisplay').textContent = gameState.level;
+            document.getElementById('sequenceDisplay').textContent = gameState.sequence.length;
+        }
+        // Update all buttons disabled state
+        function updateAllButtons(disabled) {
+            document.querySelectorAll('.simon-button').forEach(btn => {
+                if (disabled) {
+                    btn.removeEventListener('click', onButtonClick);
+                    btn.disabled = true;
+                } else {
+                    btn.addEventListener('click', onButtonClick);
+                    btn.disabled = false;
+                }
+            });
+        }
+        // Update all buttons disabled state
+        function updateAllButtons(disabled) {
+            document.querySelectorAll('.simon-button').forEach(btn => {
+                if (disabled) {
+                    btn.removeEventListener('click', onButtonClick);
+                    btn.disabled = true;
+                } else {
+                    btn.addEventListener('click', onButtonClick);
+                    btn.disabled = false;
+                }
+            });
+        }
+        // Show message
+        function showMessage(text, isGameOver = false) {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.classList.add('show');
+            if (isGameOver) {
+                message.classList.add('game-over');
+            }
+            setTimeout(() => {
+                message.classList.remove('show', 'game-over');
+            }, 2000);
+        }
+        // Initialize buttons
+        document.querySelectorAll('.simon-button').forEach(btn => {
+            btn.addEventListener('click', onButtonClick);
+        });
+        updateDisplay();
+    </script>
+</body>
+
+</html>

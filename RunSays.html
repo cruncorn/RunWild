@@ -343,8 +343,13 @@
                 playSound(color);
                 setTimeout(() => {
                     button.classList.remove('active');
+                    // Force mobile to release :active state
+                    button.style.pointerEvents = 'none';
                     button.blur();
-                    resolve();
+                    setTimeout(() => {
+                        button.style.pointerEvents = 'auto';
+                        resolve();
+                    }, 10);
                 }, duration);
             });
         }
